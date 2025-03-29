@@ -10,7 +10,7 @@ export function Router() {
         <Route path="/" element={<Login />} />
         <Route path="/Ceremony" element={<Ceremony />} />
         <Route path="/Ceremony/NewCeremony" element={<NewCeremony />} />
-        <Route path="/Ceremony/home" element={<CeremonyHome />} />
+        <Route path="/Ceremony/:id" element={<CeremonyHome />} />
     </Routes>
   )
 }

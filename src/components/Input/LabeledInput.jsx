@@ -1,10 +1,10 @@
-import { Input } from "./input"
-import { Label } from "./label"
+import { Input } from "./Input"
+import { Label } from "../label"
 
-export function InputWrapper({description = "", type = "text", name, placeholder, value, onChange, ...props}) {
+export function LabeledInput({description = "", type = "text", name, placeholder, value, onChange, ...props}) {
   
   return (
-    <div className="flex w-full flex-col gap-4 ">
+    <div className="flex w-full flex-col">
       <Label description={description}/>
       <Input 
         description={placeholder} 

@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router";
-import { Header } from "../../components/header"
-import { PrimaryButton } from "../../components/primaryButton";
+import { Header } from "../../components/Header"
+import { PrimaryButton } from "../../components/Button";
 import { useState } from "react";
-import { InputWrapper } from "../../components/inputWrapper";
+import { LabeledInput } from "../../components/Input";
 import axios from "axios";
 
 export function NewCeremony() {
@@ -25,7 +25,7 @@ export function NewCeremony() {
     const value = e.target.value;
     setEventCity(value);
   }
-  
+
   const changeEventPlace = (e) => {
     const value = e.target.value;
     setEventPlace(value);
@@ -48,50 +48,54 @@ export function NewCeremony() {
 
   const createEvent = async (e) => {
     e.preventDefault();
-    
+
     console.log("Chegou aqui")
-    try{
-      console.log("Enviando dados:", {eventName, eventCity, eventPlace, eventDate, eventStartTime, eventEndTime })
-      
+    try {
+      console.log("Enviando dados:", { eventName, eventCity, eventPlace, eventDate, eventStartTime, eventEndTime })
+
       const response = await axios.post('http://localhost:8000/ceremony', {
-        eventName, 
+        eventName,
         eventCity,
         eventPlace,
         eventDate,
         eventStartTime,
         eventEndTime
       },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
       console.log("Evento cadastrado com sucesso: ", response)
       navigate('/Ceremony');
-    }catch(error) {
+    } catch (error) {
       console.log(error);
     }
     console.log("Evento criado com sucesso");
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center bg-zinc-900 px-16">
-      <Header className="top-0 left-0"/>
-      
-      <form  className="w-10/12 flex flex-col gap-4 p-8">
-        <InputWrapper description="Evento" placeholder="XXXVII Evento do Lúdico" type="text" name="eventName" value={eventName} onChange={changeEventName}/>
-        <InputWrapper description="Cidade" placeholder="Cornélio Procópio" type="text" name="eventCity" value={eventCity} onChange={changeEventCity}/>
-        <InputWrapper description="Local" placeholder="Hall da UTFPR de Cornélio Procópio" type="text" name="eventPlace" value={eventPlace} onChange={changeEventPlace}/>
+    <div className="min-h-screen w-full flex flex-col items-center bg-zinc-700">
+      <Header className="top-0 left-0" />
+
+      <form className="w-10/12 flex flex-col gap-4 p-8">
+        <LabeledInput description="Evento" placeholder="XXXVII Evento do Lúdico" type="text" name="eventName" value={eventName} onChange={changeEventName} />
+        <LabeledInput description="Cidade" placeholder="Cornélio Procópio" type="text" name="eventCity" value={eventCity} onChange={changeEventCity} />
+        <LabeledInput description="Local" placeholder="Hall da UTFPR de Cornélio Procópio" type="text" name="eventPlace" value={eventPlace} onChange={changeEventPlace} />
         <div className="flex gap-24 w-full items-center">
-          <InputWrapper description="Data" placeholder="20/04/2024" type="date" name="eventDate" value={eventDate} onChange={changeEventDate}/>
-          <InputWrapper description="Início" placeholder="13:00" type="time" name="eventStartTime" value={eventStartTime} onChange={changeEventStartTime}/>
-          <InputWrapper description="Fim" placeholder="Hall da UTFPR de Cornélio Procópio" type="time" name="eventEndTime" value={eventEndTime} onChange={changeEventEndTime}/>
+          <LabeledInput description="Data" placeholder="20/04/2024" type="date" name="eventDate" value={eventDate} onChange={changeEventDate} />
+          <LabeledInput description="Início" placeholder="13:00" type="time" name="eventStartTime" value={eventStartTime} onChange={changeEventStartTime} />
+          <LabeledInput description="Fim" placeholder="Hall da UTFPR de Cornélio Procópio" type="time" name="eventEndTime" value={eventEndTime} onChange={changeEventEndTime} />
         </div>
-      <div className="w-104 m-auto mt-16">
-        <PrimaryButton text="Criar Evento" onClick={createEvent}/>
-      </div>
+        <div className="w-104 m-auto mt-16">
+          <PrimaryButton
+            className="text-2xl font-bold px-8"
+            text="Criar Evento"
+            onClick={createEvent}
+          />
+        </div>
       </form>
-    
+
     </div>
   )
 }

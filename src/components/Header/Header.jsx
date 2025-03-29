@@ -1,9 +1,9 @@
 import { NavLink } from 'react-router'
-import logo from '../assets/headerLogo.svg'
+import logo from '../../assets/headerLogo.svg'
 
 export function Header () {
   return(
-    <div className="h-20 w-full flex justify-between items-center flex-row m-0 p-0">
+    <div className="h-20 bg-zinc-800 w-full flex justify-between items-center flex-row m-0 p-0">
       <div className="h-20 w-full flex gap-8 items-center flex-row m-0 p-0">
         <img src={logo} alt="Logo do projeto ludico" className='h-16 mx-6'/>
         <NavLink 
