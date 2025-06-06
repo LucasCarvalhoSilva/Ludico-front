@@ -4,6 +4,7 @@ import { Ceremony } from './pages/Ceremony'
 import { ManageCeremony } from './pages/Ceremony/ManageCeremony'
 import { ExecuteCeremony } from './pages/Ceremony/ExecuteCeremony'
 import { Admin } from './pages/Admin'
+import { Scape } from './pages/Scape'
 
 export function Router() {
   return (
@@ -13,6 +14,7 @@ export function Router() {
       <Route path="/Ceremony/create" element={<ManageCeremony />} />
       <Route path="/Ceremony/:id" element={<ManageCeremony />} />
       <Route path="/Ceremony/:id/execute" element={<ExecuteCeremony />} />
+      <Route path="/Scape/" element={<Scape />} />
       <Route path="/Admin" element={<Admin />} />
       </Routes>
   )
