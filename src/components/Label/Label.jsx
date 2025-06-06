@@ -1,5 +1,5 @@
-export function Label({description}) {
+export function Label({ description, toUppercase = true, labelWeight }) {
   return (
-    <label className="text-2xl text-zinc-50 w-full uppercase m-0">{description}</label>
+    <label className={`text-2xl text-zinc-50 w-full m-0 ${toUppercase ? "uppercase" : ""} ${labelWeight ? labelWeight : ""}`} >{description}</label>
   )
 }

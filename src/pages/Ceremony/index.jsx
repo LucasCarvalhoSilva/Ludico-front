@@ -7,19 +7,17 @@ import { useCeremonyContext } from '../../contexts/CeremonyContext'
 import axios from "axios";
 import { format } from "date-fns";
 import { ptBR } from 'date-fns/locale';
-import { LabeledSelect } from "../../components/Select";
-import { Modal } from "../../components/Modal";
 
 export function Ceremony() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const token = localStorage.getItem('authToken');
-  const { setOpenCeremony } = useCeremonyContext()
+  const { setOpenCeremony } = useCeremonyContext();
 
   const handleRowClick = (_id) => {
     console.log(_id)
     setOpenCeremony(_id)
-    navigate(`/Ceremony/${_id}`);
+    navigate(`/Ceremony/${_id}/execute`);
   }
 
   const buildObject = (data) => {
@@ -61,23 +59,30 @@ export function Ceremony() {
 
   const handleEdit = (item) => {
     console.log('Editar:', item);
-    // Lógica para editar o item
+    navigate('/Ceremony/' + item._id);
   };
 
-  const handleDelete = (item) => {
-    console.log('Deletar:', item);
-    // Lógica para remover o item
-    setDados((prevDados) => prevDados.filter((d) => d !== item));
+  const handleDelete = async (item) => {
+    const response = await axios.delete('http://localhost:8000/ceremony/' + item._id,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+    if (response.status === 200) {
+      setData((prevDados) => prevDados.filter((d) => d !== item));
+    }
   };
 
   const navigateToNewCeremony = () => {
-    navigate('/Ceremony/NewCeremony')
+    navigate('/Ceremony/create')
   }
 
   return (
     <div className="min-h-screen w-screen flex flex-col items-center bg-zinc-700 m-0 p-0">
       <Header className="top-0 left-0" />
-      <div>
+      <div className="flex flex-col items-center justify-center gap-16 my-16">
         <Table
           column={column}
           data={data}
@@ -96,32 +101,6 @@ export function Ceremony() {
               text="Criar Novo Evento"
             />
           </div>
-        </div>
-        <div className="mt-10 w-1/2">
-          <LabeledSelect
-            description="Grande opções para serem selecionadas"
-            options={[
-              { id: "teste1", text: "Primeira opção" },
-              { id: "teste2", text: "Segunda opção" },
-              { id: "teste3", text: "Terceira opção" },
-              { id: "teste4", text: "Quarta opção" }
-            ]}
-            onChange={(e) => console.log(e.target.value)}
-          />
-        </div>
-        <div className="mt-10 w-1/2">
-          <button id="openModal">Open the modal</button>
-
-          <Modal
-            openerId="openModal"
-            modalId="testingModal"
-            content={
-              <div className="flex flex-col">
-                <span>Teste de passagem de conteudo como prop</span>
-                <span>Teste de passagem de conteudo como prop</span>
-              </div>
-            }
-          />
         </div>
       </div>
     </div>

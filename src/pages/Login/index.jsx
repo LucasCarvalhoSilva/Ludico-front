@@ -61,7 +61,7 @@ export function Login() {
 
         <img src={logo} alt="" className="w-56 mx-auto" />
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-4 p-8">
+        <form onSubmit={handleLogin} className="flex flex-col gap-6 p-8">
           <LabeledInput
             description="usuário"
             type="text"
