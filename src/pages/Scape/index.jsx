@@ -4,9 +4,11 @@ import { LabeledInput } from "../../components/Input";
 import { LabeledSelect } from "../../components/Select";
 import axios from "axios";
 import { PrimaryButton } from "../../components/Button";
+import { Table } from "../../components/Table";
+import { use } from "react";
 
 export function Scape() {
-  const [isCreating, setIsCreating] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [roomName, setRoomName] = useState('');
   const [duration, setDuration] = useState('');
@@ -15,6 +17,29 @@ export function Scape() {
   const [maxQuantityOfParticipants, setMaxQuantityOfParticipants] = useState('');
   const [addScapeError, setAddScapeError] = useState(false);
   const token = localStorage.getItem('authToken');
+  const [scapes, setScapes] = useState([]);
+
+  useEffect(() => {
+    getScapes();
+  }, []);
+
+  const getScapes = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/scapeRoomHistory`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (response.status === 200) {
+        setScapes(response.data);
+      } else {
+        console.error("Failed to fetch scapes:", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching scapes:", error);
+    }
+  }
 
   const changeRoomName = (e) => {
         const value = e.target.value;
@@ -88,10 +113,28 @@ export function Scape() {
     }
   }
 
+  const handleDelete = async (item) => {
+    try {
+      const response = await axios.delete(`http://localhost:8000/scapeRoomHistory/${item._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (response.status === 200) {
+        setScapes((prevScapes) => prevScapes.filter((scape) => scape._id !== item._id));
+      } else {
+        console.error("Failed to delete scape:", response.data);
+      }
+    } catch (error) {
+      console.error("Error deleting scape:", error);
+    }
+  }
+
   return (
     <>
-      {isCreating ? (
-        <div className="h-screen w-screen bg-zinc-900">
+      {isCreating ? 
+        <div className="h-screen w-screen bg-zinc-700">
           <Header title="Create Scape" />
           <div className="flex flex-col items-center mt-8">
             <div className="w-1/2 flex flex-col gap-4">
@@ -152,7 +195,8 @@ export function Scape() {
             </div>
           </div>
         </div>
-      ) : (
+      :
+      isEditing ?
         <div>
           <h1>Edit Scape</h1>
           <button onClick={() => setIsEditing(!isEditing)}>
@@ -160,7 +204,32 @@ export function Scape() {
           </button>
           
         </div>
-      )}
+      :
+      <div className="h-screen w-screen bg-zinc-700 p-0 m-0">
+        <Header title="Scape" />
+        <div className="w-full flex flex-col px-14 mt-4">
+          <Table
+            title="Scapes"
+            column={["História", "Duração", "Formato", "Limite Mínimo", "Limite Máximo"]}
+            data={scapes?.map((scape) => ({
+              _id: scape._id,
+              history: scape.name,
+              duration: scape.duration,
+              format: scape.mode,
+              minLimit: scape.minPlayerQuantity,
+              maxLimit: scape.maxPlayerQuantity
+            }))}
+            hasEdit={false}
+            hasDelete={true}
+            onDelete={handleDelete}
+            hasAddPresence={false}
+            onAddPlayer={() => console.log("Add Player")}
+          />
+        </div>
+      </div>
+      
+      
+    }
     </>
   )
 }
