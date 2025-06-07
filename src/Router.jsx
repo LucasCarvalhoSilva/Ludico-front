@@ -5,6 +5,7 @@ import { ManageCeremony } from './pages/Ceremony/ManageCeremony'
 import { ExecuteCeremony } from './pages/Ceremony/ExecuteCeremony'
 import { Admin } from './pages/Admin'
 import { Scape } from './pages/Scape'
+import { BoardGames } from './pages/BoardGames'
 
 export function Router() {
   return (
@@ -15,6 +16,7 @@ export function Router() {
       <Route path="/Ceremony/:id" element={<ManageCeremony />} />
       <Route path="/Ceremony/:id/execute" element={<ExecuteCeremony />} />
       <Route path="/Scape/" element={<Scape />} />
+      <Route path="/BoardGame/" element={<BoardGames />} />
       <Route path="/Admin" element={<Admin />} />
       </Routes>
   )
