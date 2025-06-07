@@ -18,6 +18,7 @@ export function Scape() {
   const [addScapeError, setAddScapeError] = useState(false);
   const token = localStorage.getItem('authToken');
   const [scapes, setScapes] = useState([]);
+  const [selectedScape, setSelectedScape] = useState(null);
 
   useEffect(() => {
     getScapes();
@@ -97,6 +98,7 @@ export function Scape() {
       })
 
       if(response.status === 201) {
+        getScapes();
         console.log("Scape added successfully");
         cleanInputs();
         setIsCreating(false);
@@ -132,11 +134,12 @@ export function Scape() {
   }
 
   const handleOnClickEdit = async (item) => {
-    setRoomName(item.name);
+    setSelectedScape(item);
+    setRoomName(item.history);
     setDuration(item.duration);
-    setFormat(item.mode);
-    setMinQuantityOfParticipants(item.minPlayerQuantity); 
-    setMaxQuantityOfParticipants(item.maxPlayerQuantity);
+    setFormat(item.format);
+    setMinQuantityOfParticipants(item.minLimit); 
+    setMaxQuantityOfParticipants(item.maxLimit);
     setIsEditing(true);
     
 
@@ -144,12 +147,14 @@ export function Scape() {
   }
 
   const handleUpdate = async (item) => {
+    console.log("Updating scape:", item);
     if (!roomName || !duration || !format || !minQuantityOfParticipants || !maxQuantityOfParticipants) {
       setAddScapeError(true);
       return;
     }
+
     try {
-      const response = await axios.put(`http://localhost:8000/scapeRoomHistory/${item._id}`,{
+      const response = await axios.put(`http://localhost:8000/scapeRoomHistory/${selectedScape._id}`,{
         name: roomName,
         duration: duration,
         minPlayerQuantity: minQuantityOfParticipants,
@@ -234,7 +239,7 @@ export function Scape() {
               <div className="flex justify-center">
                 <PrimaryButton
                   className="w-fit text-2xl font-bold px-8 mt-6"
-                  onClick={handleAddScape}
+                  onClick={handleAddScape(item._id)}
                   text="Cadastrar Scape"
                   fullWidth={false}
                 />
@@ -320,11 +325,11 @@ export function Scape() {
               minLimit: scape.minPlayerQuantity,
               maxLimit: scape.maxPlayerQuantity
             }))}
-            hasEdit={false}
+            hasEdit={true}
             hasDelete={true}
             onDelete={handleDelete}
+            onEdit={handleOnClickEdit}
             hasAddPresence={false}
-            onRowClick={handleOnClickEdit}
           />
         </div>
         <div className="flex w-full justify-end mt-9 px-14">

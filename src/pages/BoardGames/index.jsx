@@ -1,9 +1,360 @@
+import { is } from "date-fns/locale"
+import { useState, useEffect } from "react"
+import { Header } from "../../components/Header"
+import { Table } from "../../components/Table"
+import { PrimaryButton } from "../../components/Button"
+import { LabeledInput } from "../../components/Input"
+import { LabeledSelect } from "../../components/Select"
+import axios from "axios"
+
 export function BoardGames() {
+  const [isCreating, setIsCreating] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [boardGames, setBoardGames] = useState([])
+  const token = localStorage.getItem('authToken');
+  const [boardGameName, setBoardGameName] = useState("")
+  const [minAge, setMinAge] = useState("")
+  const [quantityOfPlayers, setQuantityOfPlayers] = useState("")
+  const [storageLocation, setStorageLocation] = useState("")
+  const [publisher, setPublisher] = useState("")
+  const [designers, setDesigners] = useState("")
+  const [sugestedNumberOfPlayers, setSugestedNumberOfPlayers] = useState("")
+  const [bggRating, setBggRating] = useState("")
+  const [owner, setOwner] = useState("")
+  const [barCode, setBarCode] = useState("")
+  const [addBoardGameError, setAddBoardGameError] = useState(false)
+  const [mainCategory, setMainCategory] = useState("Board Game")
+  const [mechanicsList, setMechanicsList] = useState([""]);
+  const [themeList, setThemeList] = useState([""]);
+
+  useEffect(() => {
+    
+    getBoardGames()
+  }, [])
+
+  
+  const cleanInputs = () => {
+    setBoardGameName("")
+    setMinAge("")
+    setQuantityOfPlayers("")
+    setStorageLocation("")
+    setPublisher("")
+    setDesigners("")
+    setSugestedNumberOfPlayers("")
+    setBggRating("")
+    setOwner("")
+    setBarCode("")
+    setMechanicsList([""])
+    setThemeList([""])
+    setAddBoardGameError(false)
+    setMainCategory("")
+  }
+  
+  const changeBoardGameName = (e) => {
+    setBoardGameName(e.target.value)
+  }
+
+  const changeMainCategory = (e) => {
+    setMainCategory(e.target.value)
+  }
+
+  const chageBarCode = (e) => {
+    setBarCode(e.target.value)
+  }
+  
+  const changeMinAge = (e) => {
+    setMinAge(e.target.value)
+  }
+
+  const changeQuantityOfPlayers = (e) => {
+    setQuantityOfPlayers(e.target.value)
+  }
+  
+  const changeStorageLocation = (e) => {
+    setStorageLocation(e.target.value)
+  }
+  
+  const changePublisher = (e) => {
+    setPublisher(e.target.value) 
+  }
+  
+  const changeDesigners = (e) => {
+    setDesigners(e.target.value)
+  }
+  
+  const changeSugestedNumberOfPlayers = (e) => {
+    setSugestedNumberOfPlayers(e.target.value)
+  }
+  
+  const changeBggRating = (e) => {
+    setBggRating(e.target.value)
+  }
+  
+  const changeOwner = (e) => {
+    setOwner(e.target.value)
+  }
+
+  const handleMechanicChange = (index, value) => {
+    const updatedMechanics = [...mechanicsList];
+    updatedMechanics[index] = value;
+    setMechanicsList(updatedMechanics);
+  };
+
+  const handleAddMechanic = () => {
+    setMechanicsList([...mechanicsList, ""]);
+  };
+  
+  const handleThemesChanges = (index, value) => {
+    const updatedThemes = [...themeList];
+    updatedThemes[index] = value;
+    setThemeList(updatedThemes);
+  }
+
+  const handleAddTheme = () => {
+    setThemeList([...themeList, ""]);
+  }
+
+  const getBoardGames = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/boardgame',{
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (response.status === 200) {
+        setBoardGames(response.data);
+      }
+      else {
+        console.error("Failed to fetch board games:", response);
+        
+      }
+    } catch (error) {
+      console.error("Error fetching board games:", error);
+      
+    }
+  }
+
+  const handleAddBoardGame = async () => {
+    try {
+      const response = await axios.post(`http://localhost:8000/boardgame`,{
+        boardGameName: boardGameName,
+        minAge: minAge,
+        qrCode: barCode,
+        minPlayerQuantity: 1,
+        maxPlayerQuantity: quantityOfPlayers,
+        publisher: publisher,
+        designer: designers,
+        bggRank: 0,
+        IsExpansion: false,
+        mainCategory: mainCategory,
+        mechanics: mechanicsList,
+        themeList: themeList,
+        storageLocation: storageLocation,
+        isExpasion: false,
+        bestQuantityOfPlayers: sugestedNumberOfPlayers,
+        rating: bggRating,
+        owner: owner,
+      },{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      if(response.status === 201) {
+        console.log("Board Game added successfully");
+        getBoardGames();
+        cleanInputs();
+        setIsCreating(false);
+      }else {
+        console.error("Failed to add scape:", response.data);
+        setAddBoardGameError(true);
+        return;
+      }
+    }
+    catch (error) {
+      console.error("Error adding scape:", error);
+      setAddBoardGameError(true);
+      return;
+    }
+  }
+
+  
+
   return (
-    <div>
-      <h1>Board Games</h1>
-      <p>Welcome to the Board Games page!</p>
-      {/* Add your board games content here */}
-    </div>
+    <>
+      {isCreating ? 
+        <div className="min-h-screen w-screen bg-zinc-700 pb-8">
+          <Header title="Create Scape" />
+          <div className="flex flex-col items-center mt-8">
+            <div className="w-1/2 flex flex-col gap-4">
+              <LabeledInput
+                description="Jogo"
+                placeholder="Nome do jogo de tabuleiro"
+                toUppercase={false}
+                value={boardGameName}
+                onChange={changeBoardGameName}
+              />
+              <LabeledInput
+                description="Código de Barras"
+                placeholder="Código de barras do jogo"
+                toUppercase={false}
+                value={barCode}
+                onChange={chageBarCode}
+              />
+              <div className="flex gap-12 items-end">
+                <LabeledInput
+                  description="Idade Mínima"
+                  placeholder="Idade mínima para jogar"
+                  toUppercase={false}
+                  value={minAge}
+                  onChange={changeMinAge}
+                />
+                <LabeledInput
+                  description="Quantidade de Jogadores"
+                  placeholder={"Quantidade máxima de jogadores"}
+                  toUppercase={false}
+                  value={quantityOfPlayers}
+                  onChange={changeQuantityOfPlayers}
+                />
+              </div>
+              <LabeledInput
+                description="Local de Armazenagem"
+                placeholder="Local onde o jogo é armazenado"
+                toUppercase={false}
+                value={storageLocation}
+                onChange={changeStorageLocation}
+              />
+              <div className="flex gap-12 items-end">
+                <LabeledInput
+                  description="Editora"
+                  placeholder="Editora do jogo"
+                  toUppercase={false}
+                  value={publisher}
+                  onChange={changePublisher}
+                />
+                <LabeledInput
+                  description="Designers do jogo"
+                  placeholder="Nome dos designers do jogo"
+                  toUppercase={false}
+                  value={designers}
+                  onChange={changeDesigners}
+                />
+              </div>
+              
+              <LabeledInput
+                  description="Categoria Principal do Jogo (Ex: Card Game)"
+                  placeholder="Categoria Principal"
+                  toUppercase={false}
+                  value={mainCategory}
+                  onChange={changeMainCategory}
+                />
+
+              {mechanicsList.map((mechanic, idx) => (
+                <LabeledInput
+                  key={idx}
+                  description={idx === 0 ? "Mecânica" : `Mecânica ${idx + 1}`}
+                  placeholder="Mecânica do jogo"
+                  toUppercase={false}
+                  value={mechanic}
+                  onChange={e => handleMechanicChange(idx, e.target.value)}
+                />
+              ))}
+              <button
+                type="button"
+                className="text-zinc-50 text-left w-fit mb-2 text-xl"
+                onClick={handleAddMechanic}
+              >
+                Adicionar outra mecânica
+              </button>
+              {themeList.map((theme, idx) => (
+                <LabeledInput
+                  key={idx}
+                  description={idx === 0 ? "Tema" : `Tema ${idx + 1}`}
+                  placeholder="Tema do jogo"
+                  toUppercase={false}
+                  value={theme}
+                  onChange={e => handleThemesChanges(idx, e.target.value)}
+                />
+              ))}
+              <button
+                type="button"
+                className="text-zinc-50 text-left w-fit mb-2 text-xl"
+                onClick={handleAddTheme}
+              >
+                Adicionar outro tema
+              </button>              
+              <div className="flex gap-12 items-end">
+                <LabeledInput
+                  description="Quantidade Ideal de Jogadores"
+                  placeholder="Sugestão de quantidade de jogadores"
+                  toUppercase={false}
+                  value={sugestedNumberOfPlayers}
+                  onChange={changeSugestedNumberOfPlayers}
+                />
+                <LabeledInput
+                  description="Avaliação do jogo no BGG"
+                  placeholder="Avaliação no BGG"
+                  toUppercase={false}
+                  value={bggRating}
+                  onChange={changeBggRating}
+                />
+              </div>
+              <LabeledInput
+                description="Proprietário"
+                placeholder="Proprietário do jogo"
+                toUppercase={false}
+                value={owner}
+                onChange={changeOwner}
+              />
+              {addBoardGameError &&
+                <span className="text-red-400 font-bold text-center">Preencha todos os campos</span>
+              }
+              <div className="flex justify-center">
+                <PrimaryButton
+                  className="w-fit text-2xl font-bold px-8 mt-6"
+                  onClick={handleAddBoardGame}
+                  text="Cadastrar Scape"
+                  fullWidth={false}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      : isEditing ?
+        <div></div>
+      : 
+        <div className="h-screen w-screen bg-zinc-700 p-0 m-0">
+          <Header title="Scape" />
+          <div className="w-full flex flex-col px-14 mt-16">
+            <Table
+              title="Board Games"
+              column={["Jogo", "Local de Armazenagem", "Status", "Quantidade de Jogadores Sugerida"]}
+              data={boardGames?.map((boardGame) => ({
+                _id : boardGame._id,
+                jogo: boardGame.boardGameName,
+                local: boardGame.storageLocation,
+                status: boardGame.isAvailable ? "Disponível" : "Indisponível",
+                bestQuantity: boardGame.bestQuantityOfPlayers
+              }))}
+              hasEdit={false}
+              hasDelete={false}
+              onDelete={() => console.log("Delete")}
+              onEdit={() => setIsEditing(false)}
+              hasAddPresence={false}
+              onRowClick={() => setIsEditing(true)}
+            />
+          </div>
+          <div className="flex w-full justify-end mt-9 px-14">
+            <PrimaryButton
+              className="w-fit text-2xl font-bold px-8"
+              onClick={() => setIsCreating(true)}
+              text="Criar Jogo de Tabuleiro"
+              fullWidth={false}
+            />
+          </div>
+        </div>
+      }
+    </>
   )
 }
