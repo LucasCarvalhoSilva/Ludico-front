@@ -6,7 +6,7 @@ import { PrimaryButton } from "../../components/Button"
 import { LabeledInput } from "../../components/Input"
 import { LabeledSelect } from "../../components/Select"
 import axios from "axios"
-import { set } from "lodash"
+import { Modal } from "../../components/Modal"
 
 export function BoardGames() {
   const [isCreating, setIsCreating] = useState(false)
@@ -28,6 +28,7 @@ export function BoardGames() {
   const [mechanicsList, setMechanicsList] = useState([""]);
   const [themeList, setThemeList] = useState([""]);
   const [selectedBoardGame, setSelectedBoardGame] = useState(null);
+  const [borrow, setBorrow] = useState("");
 
   useEffect(() => {
     
@@ -50,6 +51,8 @@ export function BoardGames() {
     setThemeList([""])
     setAddBoardGameError(false)
     setMainCategory("")
+    selectedBoardGame(null);
+    setBorrow("");
   }
   
   const changeBoardGameName = (e) => {
@@ -114,6 +117,10 @@ export function BoardGames() {
 
   const handleAddTheme = () => {
     setThemeList([...themeList, ""]);
+  }
+
+  const changeBorrow = (e) => {
+    setBorrow(e.target.value)
   }
 
   const getBoardGames = async () => {
@@ -283,11 +290,18 @@ export function BoardGames() {
 
   const handleLent = async (item) => {
     console.log("Lending board game:", item._id);
+    setSelectedBoardGame(item);
 
+    document.getElementById("lentGameModal")?.showModal();
+  }
+
+  
+  const handleConfirmLent = async () => {
+    console.log("Confirming lent for board game:", selectedBoardGame._id);
     try {
       const response = await axios.post(`http://localhost:8000/lent`,{
-        boardgameLent: item._id,
-        participator: "682a40017e57f6dfea9f93b3"
+        boardgameLent: selectedBoardGame._id,
+        participator: borrow
       },{
         headers: {
           Authorization: `Bearer ${token}`
@@ -297,14 +311,14 @@ export function BoardGames() {
       if(response.status === 200) {
         console.log("Board game lent successfully");
         getBoardGames();
+        cleanInputs();
+        document.getElementById("lentGameModal")?.close();
       }
     } catch (error) {
       console.error("Error lending board game:", error);
       return;
     }
   }
-
-  
 
   const handleReturnBoardGame = async (item) => {
     console.log("Returning board game:", item._id);
@@ -654,6 +668,32 @@ export function BoardGames() {
           </div>
         </div>
       }
+      <Modal
+        openerId="lentGameModal"
+        modalId="lentGameModal"
+        content={
+            <div className="">
+                <div className="w-full flex flex-col gap-4 px-8 items-center">
+                    <LabeledInput
+                        description="Informe o RA ou CPF de quem está pegando o jogo emprestado?"
+                        placeholder="João da Silva"
+                        type="text"
+                        name="player"
+                        value={borrow}
+                        onChange={changeBorrow}
+                        toUppercase={false}
+                    />
+                    <PrimaryButton
+                        className="text-2xl font-bold px-8 my-4 w-10/12"
+                        text="Emprestar Jogo"
+                        toUppercase={false}
+                        fullWidth={false}
+                        onClick={handleConfirmLent}
+                    />
+                </div>
+            </div>
+        }
+    />
     </>
   )
 }
