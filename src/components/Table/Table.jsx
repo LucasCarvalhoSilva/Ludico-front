@@ -17,6 +17,7 @@ export function Table({
   onGreenButtonPress,
   hasAddPlayer = false,
   onAddPlayer,
+  customButton
 }) {
   if (!Array.isArray(data)) {
     return <div>Carregando...</div>; // Ou outro indicador de carregamento
@@ -155,6 +156,9 @@ export function Table({
                         </svg>
 
                       </button>
+                    )}
+                    {customButton && (
+                      customButton(item)
                     )}
                   </div>
                 </td>

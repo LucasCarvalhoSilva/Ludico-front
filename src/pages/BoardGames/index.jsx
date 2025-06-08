@@ -1,4 +1,4 @@
-import { is, se } from "date-fns/locale"
+import { ca, is, se } from "date-fns/locale"
 import { useState, useEffect } from "react"
 import { Header } from "../../components/Header"
 import { Table } from "../../components/Table"
@@ -280,6 +280,53 @@ export function BoardGames() {
     
     setIsEditing(false);
   }  
+
+  const handleLent = async (item) => {
+    console.log("Lending board game:", item._id);
+
+    try {
+      const response = await axios.post(`http://localhost:8000/lent`,{
+        boardgameLent: item._id,
+        participator: "682a40017e57f6dfea9f93b3"
+      },{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      if(response.status === 200) {
+        console.log("Board game lent successfully");
+        getBoardGames();
+      }
+    } catch (error) {
+      console.error("Error lending board game:", error);
+      return;
+    }
+  }
+
+  
+
+  const handleReturnBoardGame = async (item) => {
+    console.log("Returning board game:", item._id);
+    try {
+      const response = await axios.put(`http://localhost:8000/boardgame/return/`,{
+        boardGameId: item._id
+      },{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      if(response.status === 200) {
+        console.log("Board game returned successfully");
+        getBoardGames();
+      } else {
+        console.error("Failed to return board game:", response.data);
+      }
+    }catch (error) {
+      console.error("Error returning board game:", error);
+      return;
+    }
+  }
 
   return (
     <>
@@ -578,6 +625,23 @@ export function BoardGames() {
               onDelete={handleDelete}
               onEdit={handleOnClickEdit}
               hasAddPresence={false}
+              customButton={(item) => {
+                if(item.status === "Disponível") {
+                    return (
+                    <button
+                      className="w-40 flex flex-col text-2xl font-bold bg-green-500 hover:bg-green-600 text-zinc-50 rounded-full"
+                      onClick={() => handleLent(item)}
+                    >Emprestar</button>
+                    )
+                } else {
+                  return (
+                    <button
+                      className="w-40 flex flex-col text-2xl font-bold bg-orange-500 hover:bg-orange-600 text-zinc-50 rounded-full"
+                      onClick={() => handleReturnBoardGame(item)}
+                    >Devolver</button>
+                  )
+                }
+              }}
             />
           </div>
           <div className="flex w-full justify-end mt-9 px-14">
