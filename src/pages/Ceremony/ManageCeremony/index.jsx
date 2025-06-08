@@ -26,7 +26,7 @@ export function ManageCeremony() {
   const fetchData = async () => {
     let response
     try {
-      response = await axios.get(`http://localhost:8000/ceremony/${routerParams.id}`, {
+      response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/${routerParams.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -84,7 +84,7 @@ export function ManageCeremony() {
     try {
       console.log("Enviando dados:", { eventName, eventCity, eventPlace, eventDate, eventStartTime, eventEndTime })
 
-      const response = await axios.post('http://localhost:8000/ceremony', {
+      const response = await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony`, {
         eventName,
         eventCity,
         eventPlace,
@@ -112,7 +112,7 @@ export function ManageCeremony() {
     try {
       console.log("Enviando dados:", { eventName, eventCity, eventPlace, eventDate, eventStartTime, eventEndTime })
 
-      const response = await axios.put('http://localhost:8000/ceremony/' + routerParams.id, {
+      const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/` + routerParams.id, {
         eventName,
         eventCity,
         eventPlace,

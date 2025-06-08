@@ -39,7 +39,7 @@ export function Ceremony() {
       let response
       try {
         console.log("Chega aqui")
-        response = await axios.get('http://localhost:8000/ceremony', {
+        response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -63,7 +63,7 @@ export function Ceremony() {
   };
 
   const handleDelete = async (item) => {
-    const response = await axios.delete('http://localhost:8000/ceremony/' + item._id,
+    const response = await axios.delete(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/` + item._id,
       {
         headers: {
           Authorization: `Bearer ${token}`,

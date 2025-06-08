@@ -125,7 +125,7 @@ export function BoardGames() {
 
   const getBoardGames = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/boardgame',{
+      const response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/boardgame`,{
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -146,7 +146,7 @@ export function BoardGames() {
 
   const handleAddBoardGame = async () => {
     try {
-      const response = await axios.post(`http://localhost:8000/boardgame`,{
+      const response = await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/boardgame`,{
         boardGameName: boardGameName,
         minAge: minAge,
         qrCode: barCode,
@@ -190,7 +190,7 @@ export function BoardGames() {
 
   const handleOnClickEdit = async (item) => {
     try {
-      const response = await axios.get(`http://localhost:8000/boardgame/${item._id}`, {
+      const response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/boardgame/${item._id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -226,7 +226,7 @@ export function BoardGames() {
 
   const handleDelete = async (item) => {
     try {
-      const response = await axios.delete(`http://localhost:8000/boardgame/${item._id}`, {
+      const response = await axios.delete(`${import.meta.env.VITE_SERVER_BASE_URL}/boardgame/${item._id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -247,7 +247,7 @@ export function BoardGames() {
     
 
     try {
-      const response = await axios.put(`http://localhost:8000/boardgame/${selectedBoardGame._id}`,{
+      const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/boardgame/${selectedBoardGame._id}`,{
         boardGameName: boardGameName,
         minAge: minAge,
         qrCode: barCode,
@@ -299,7 +299,7 @@ export function BoardGames() {
   const handleConfirmLent = async () => {
     console.log("Confirming lent for board game:", selectedBoardGame._id);
     try {
-      const response = await axios.post(`http://localhost:8000/lent`,{
+      const response = await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/lent`,{
         boardgameLent: selectedBoardGame._id,
         participator: borrow
       },{
@@ -323,7 +323,7 @@ export function BoardGames() {
   const handleReturnBoardGame = async (item) => {
     console.log("Returning board game:", item._id);
     try {
-      const response = await axios.put(`http://localhost:8000/boardgame/return/`,{
+      const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/boardgame/return/`,{
         boardGameId: item._id
       },{
         headers: {

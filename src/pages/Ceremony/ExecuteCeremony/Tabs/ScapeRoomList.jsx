@@ -29,7 +29,7 @@ export function ScapeRoomList({ data, setSelectedTab, fetchData }) {
 
     const getScapeRoomHistory = async () => {
         try {
-            const response = await axios.get("http://localhost:8000/scapeRoomHistory", {
+            const response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/scapeRoomHistory`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -105,7 +105,7 @@ export function ScapeRoomList({ data, setSelectedTab, fetchData }) {
         }
 
         try {
-            const response = await axios.put(`http://localhost:8000/ceremony/${data._id}/addScapeRoomSession`, {
+            const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/${data._id}/addScapeRoomSession`, {
                 startedAt: start,
                 finishedAt: end,
                 history,
@@ -141,7 +141,7 @@ export function ScapeRoomList({ data, setSelectedTab, fetchData }) {
             return
         }
         try {
-            const response = await axios.put(`http://localhost:8000/scapeRoomSession/${selectedScapeRoom._id}/addParticipator`, {
+            const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/scapeRoomSession/${selectedScapeRoom._id}/addParticipator`, {
                 participatorId: selectedParticipator.identifier
             },
                 {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useUser } from "../../contexts/AuthContext";
 import logo from "../../assets/logoLudico.png"
 import { LabeledInput } from "../../components/Input"
 import { PrimaryButton } from "../../components/Button"
@@ -10,6 +11,7 @@ export function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const { setUser } = useUser();
 
   const navigate = useNavigate();
 
@@ -29,10 +31,11 @@ export function Login() {
     try {
       setErrorMessage("")
       console.log("Enviando dados:", { username, password });
-      const response = await axios.post('http://localhost:8000/login', {
+      const response = await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/login`, {
         username,
         password,
       });
+      setUser(response.data);
       return response.data
     } catch (error) {
       const _errorMessage = error.response?.data?.message || 'Erro no login';

@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useNavigate } from 'react-router'
 import { LabeledInput } from "../../../../components/Input";
 import { PrimaryButton } from "../../../../components/Button";
 import { Table } from "../../../../components/Table";
@@ -18,6 +19,7 @@ export function CeremonyManaging({ data, lentData, fetchLentData, setSelectedTab
     const [playerCount, setPlayerCount] = useState();
     const [playedTimes, setPlayedTimes] = useState();
     const token = localStorage.getItem('authToken');
+    const navigate = useNavigate();
 
     console.log(data)
 
@@ -49,8 +51,8 @@ export function CeremonyManaging({ data, lentData, fetchLentData, setSelectedTab
 
     const handleAddParticipator = async () => {
         if (selectedParticipator?._id) {
-            const response = await axios.put(`http://localhost:8000/ceremony/${data._id}/addParticipator`, {
-                participatorId: selectedParticipator?._id
+            const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/${data._id}/addParticipator`, {
+                participatorId: selectedParticipator?.identifier
             },
                 {
                     headers: {
@@ -80,7 +82,7 @@ export function CeremonyManaging({ data, lentData, fetchLentData, setSelectedTab
         }
 
         try {
-            const response = await axios.post(`http://localhost:8000/ceremony/${data._id}/lent`, {
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/${data._id}/lent`, {
                 boardgameLent: boardgameLentInput,
                 participator: participatorLentInput
             },
@@ -92,6 +94,8 @@ export function CeremonyManaging({ data, lentData, fetchLentData, setSelectedTab
 
             if (response.status === 200) {
                 fetchLentData();
+                setParticipatorLentInput("");
+                setBoardgameLentInput("");
                 document.getElementById("returnGameModal")?.close();
             }
         } catch (error) {
@@ -114,7 +118,7 @@ export function CeremonyManaging({ data, lentData, fetchLentData, setSelectedTab
     const handleReturnGame = async () => {
         try {
             console.log(selectedLentId);
-            const response = await axios.put('http://localhost:8000/lent/' + selectedLentId, {
+            const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/lent/` + selectedLentId, {
                 playedTimes,
                 playerCount
             },
@@ -139,7 +143,7 @@ export function CeremonyManaging({ data, lentData, fetchLentData, setSelectedTab
                 setParticipatorErrorMessage("");
                 if (input !== "") {
                     const cleanInput = input.replace(/\D/g, '');
-                    const response = await axios.get('http://localhost:8000/participator/search?identifier=' + cleanInput, {
+                    const response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/participator/search?identifier=` + cleanInput, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
@@ -161,7 +165,7 @@ export function CeremonyManaging({ data, lentData, fetchLentData, setSelectedTab
 
     const addBoardGameToCeremony = async (boardGameId) => {
         try {
-            const response = await axios.put(`http://localhost:8000/ceremony/${data._id}/addBoardGame`, {
+            const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/${data._id}/addBoardGame`, {
                 boardGameId
             },
                 {
@@ -176,7 +180,7 @@ export function CeremonyManaging({ data, lentData, fetchLentData, setSelectedTab
 
     const addParticipatorToCeremony = async (participatorId) => {
         try {
-            const response = await axios.put(`http://localhost:8000/ceremony/${data._id}/addParticipator`, {
+            const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/${data._id}/addParticipator`, {
                 participatorId
             },
                 {
@@ -341,9 +345,8 @@ export function CeremonyManaging({ data, lentData, fetchLentData, setSelectedTab
                             toUppercase={false}
                             fullWidth={false}
                             onClick={() => {
-                                // Empurra o user para o cadastro de jogo (form grandão)
-                                setSelectedTab("participantRegister");
                                 document.getElementById("gameNotInTheSystemModal")?.close();
+                                navigate("/BoardGame");
                             }}
                         />
                     </div>

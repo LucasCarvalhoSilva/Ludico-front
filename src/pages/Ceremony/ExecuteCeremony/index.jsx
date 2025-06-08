@@ -44,7 +44,7 @@ export function ExecuteCeremony() {
   const fetchData = async () => {
     let response
     try {
-      response = await axios.get(`http://localhost:8000/ceremony/${routerParams.id}`, {
+      response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/${routerParams.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -57,7 +57,7 @@ export function ExecuteCeremony() {
 
   const fetchLentData = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/lent/unreturned`, {
+      const response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/lent/unreturned`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

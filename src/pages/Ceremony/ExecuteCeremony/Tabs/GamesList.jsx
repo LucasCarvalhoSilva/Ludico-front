@@ -26,7 +26,7 @@ export function GamesList({ data, fetchData }) {
                 setBarcodeErrorMessage("");
                 if (input !== "") {
                     const cleanInput = input.replace(/\D/g, '');
-                    const response = await axios.get('http://localhost:8000/boardgame/search?qrCode=' + cleanInput, {
+                    const response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/boardgame/search?qrCode=` + cleanInput, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
@@ -58,7 +58,7 @@ export function GamesList({ data, fetchData }) {
             return;
         }
         try {
-            const response = await axios.put(`http://localhost:8000/ceremony/${data._id}/addBoardGame`, {
+            const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/${data._id}/addBoardGame`, {
                 boardGameId: boardgame.qrCode
             },
                 {
@@ -83,7 +83,7 @@ export function GamesList({ data, fetchData }) {
 
     const handleRemoveBoardGameFromCeremony = async (item) => {
         try {
-            const response = await axios.put(`http://localhost:8000/ceremony/${data._id}/removeBoardGame`, {
+            const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/${data._id}/removeBoardGame`, {
                 boardGameId: item._id
             },
                 {

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router";
-import { SubHeader } from '../../components/Header';
+import { useUser } from '../../contexts/AuthContext';
 import { Header } from '../../components/Header';
 import axios from "axios";
 import { format } from "date-fns";
 import { ptBR } from 'date-fns/locale';
-import { User } from './Tabs';
+import { User, Report } from './Tabs';
 import { Tabs } from '../../components/Tabs';
 
 const tabs = [
@@ -14,11 +14,9 @@ const tabs = [
 ];
 
 export function Admin() {
-    const routerParams = useParams();
     const token = localStorage.getItem('authToken');
+    const { user } = useUser();
 
-    const [data, setData] = useState(null);
-    const [lentData, setLentData] = useState([]);
     const [selectedTab, setSelectedTab] = useState("user");
     const [users, setUsers] = useState([]);
 
@@ -29,7 +27,7 @@ export function Admin() {
 
     const getUsers = async () => {
         try {
-            const response = await axios.get("http://localhost:8000/user", {
+            const response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/user`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -45,49 +43,23 @@ export function Admin() {
         }
     }
 
-    const buildObject = (ceremony) => {
-        console.log(ceremony)
-        const formatedData = {
-            ...ceremony,
-            eventDate: format(new Date(ceremony.eventDate), 'd \'de\' MMMM \'de\' yyyy', { locale: ptBR }),
-        };
-
-        setData(formatedData)
-    }
-
-    const fetchData = async () => {
-        let response
-        try {
-            response = await axios.get(`http://localhost:8000/ceremony/${routerParams.id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-        } catch (error) {
-            console.log("Erro ao carregar os dados!", error);
-        }
-        buildObject(response.data)
-    };
+    const tabsComponent = <div className='flex items-start w-full mt-16 mb-4'>
+        <Tabs
+            tabs={tabs}
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+        />
+    </div>
 
     return (
         <div className="min-h-screen w-screen flex flex-col items-center bg-zinc-700 m-0 p-0">
             <Header />
-            {/* <SubHeader navigationItems={navigationItems} /> */}
-            <div className='w-fit flex items-center'>
-                <div className='flex justify-start w-full mt-20  mb-4'>
-                    <Tabs
-                        tabs={tabs}
-                        selectedTab={selectedTab}
-                        setSelectedTab={setSelectedTab}
-                    />
+            {user?.role > 2 &&
+                <div className='mx-14 w-full'>
+                    {selectedTab === "user" && <User data={users} tabsComponent={tabsComponent} getUsers={getUsers} />}
+                    {selectedTab === "report" && <Report tabsComponent={tabsComponent} />}
                 </div>
-                <div className='flex w-11/12'>
-
-                </div>
-            </div>
-            <div className='mx-14 w-full'>
-                {selectedTab === "user" && <User data={users} />}
-            </div>
+            }
         </div >
     );
 }

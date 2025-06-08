@@ -68,7 +68,7 @@ export function ParticipantRegister({ data }) {
         setEmailErrorMessage("");
         setIdentifierErrorMessage("");
         try {
-            const response = await axios.post(`http://localhost:8000/participator/`, {
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/participator/`, {
                 name,
                 identifier,
                 email,

@@ -32,7 +32,7 @@ export function OneShotsList({ data, setSelectedTab, fetchData }) {
 
     const getUsers = async () => {
         try {
-            const response = await axios.get("http://localhost:8000/user", {
+            const response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/user`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -50,7 +50,7 @@ export function OneShotsList({ data, setSelectedTab, fetchData }) {
 
     const getRpgSystem = async () => {
         try {
-            const response = await axios.get("http://localhost:8000/rpgSystem", {
+            const response = await axios.get(`${import.meta.env.VITE_SERVER_BASE_URL}/rpgSystem`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -146,7 +146,7 @@ export function OneShotsList({ data, setSelectedTab, fetchData }) {
         }
 
         try {
-            const response = await axios.put(`http://localhost:8000/ceremony/${data._id}/addOneShot`, {
+            const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/ceremony/${data._id}/addOneShot`, {
                 adventure: name,
                 master,
                 quantityOfPlayers: maxParticipants,
@@ -178,7 +178,7 @@ export function OneShotsList({ data, setSelectedTab, fetchData }) {
             return
         }
         try {
-            const response = await axios.put(`http://localhost:8000/oneShot/${selectedOneShot._id}/addParticipator`, {
+            const response = await axios.put(`${import.meta.env.VITE_SERVER_BASE_URL}/oneShot/${selectedOneShot._id}/addParticipator`, {
                 participatorId: selectedParticipator.identifier
             },
                 {
