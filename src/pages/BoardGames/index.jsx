@@ -1,4 +1,4 @@
-import { is } from "date-fns/locale"
+import { is, se } from "date-fns/locale"
 import { useState, useEffect } from "react"
 import { Header } from "../../components/Header"
 import { Table } from "../../components/Table"
@@ -6,6 +6,7 @@ import { PrimaryButton } from "../../components/Button"
 import { LabeledInput } from "../../components/Input"
 import { LabeledSelect } from "../../components/Select"
 import axios from "axios"
+import { set } from "lodash"
 
 export function BoardGames() {
   const [isCreating, setIsCreating] = useState(false)
@@ -26,6 +27,7 @@ export function BoardGames() {
   const [mainCategory, setMainCategory] = useState("Board Game")
   const [mechanicsList, setMechanicsList] = useState([""]);
   const [themeList, setThemeList] = useState([""]);
+  const [selectedBoardGame, setSelectedBoardGame] = useState(null);
 
   useEffect(() => {
     
@@ -179,7 +181,105 @@ export function BoardGames() {
     }
   }
 
+  const handleOnClickEdit = async (item) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/boardgame/${item._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      if(response.status !== 200) {
+        console.error("Failed to fetch scape for edit:", response.data);
+        return;
+      }
+      
+      setSelectedBoardGame(response.data);
+      setIsEditing(true);
+      setBoardGameName(response.data.boardGameName);
+      setMinAge(response.data.minAge);
+      setBarCode(response.data.qrCode);
+      setQuantityOfPlayers(response.data.maxPlayerQuantity);
+      setStorageLocation(response.data.storageLocation);
+      setPublisher(response.data.publisher);
+      setDesigners(response.data.designer);
+      setMainCategory(response.data.mainCategory);
+      setMechanicsList(response.data.mechanics || [""]);
+      setThemeList(response.data.themes || [""]);
+      setSugestedNumberOfPlayers(response.data.bestQuantityOfPlayers);
+      setBggRating(response.data.rating);
+      setOwner(response.data.owner);
+
+      console.log("Edit scape => ", response.data);
+    }catch (error) {
+      console.error("Error fetching scape for edit:", error);
+      return;
+    }
+  }
+
+  const handleDelete = async (item) => {
+    try {
+      const response = await axios.delete(`http://localhost:8000/boardgame/${item._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (response.status === 200) {
+        setBoardGames(boardGames.filter(boardGame => boardGame._id !== item._id));
+      } else {
+        console.error("Failed to delete scape:", response.data);
+      }
+    } catch (error) {
+      console.error("Error deleting scape:", error);
+    }
+  }
   
+  const handleUpdate = async () => {
+    console.log("Updating scape:", selectedBoardGame._id);
+    
+
+    try {
+      const response = await axios.put(`http://localhost:8000/boardgame/${selectedBoardGame._id}`,{
+        boardGameName: boardGameName,
+        minAge: minAge,
+        qrCode: barCode,
+        minPlayerQuantity: 1,
+        maxPlayerQuantity: quantityOfPlayers,
+        publisher: publisher,
+        designer: designers,
+        bggRank: 0,
+        IsExpansion: false,
+        mainCategory: mainCategory,
+        mechanics: mechanicsList,
+        themeList: themeList,
+        storageLocation: storageLocation,
+        isExpasion: false,
+        bestQuantityOfPlayers: sugestedNumberOfPlayers,
+        rating: bggRating,
+        owner: owner,
+      },{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      if(response.status === 200) {
+        getBoardGames();
+        console.log("Scape updated successfully");
+        cleanInputs();
+      } else {
+        console.error("Failed to update scape:", response.data);
+        setAddBoardGameError(true);
+        return;
+      }
+    }catch (error) {
+      console.error("Error updating scape:", error);
+      setAddBoardGameError(true);
+      return;
+    }
+    
+    setIsEditing(false);
+  }  
 
   return (
     <>
@@ -314,7 +414,7 @@ export function BoardGames() {
                 <PrimaryButton
                   className="w-fit text-2xl font-bold px-8 mt-6"
                   onClick={handleAddBoardGame}
-                  text="Cadastrar Scape"
+                  text="Cadastrar Jogo"
                   fullWidth={false}
                 />
               </div>
@@ -322,7 +422,143 @@ export function BoardGames() {
           </div>
         </div>
       : isEditing ?
-        <div></div>
+        <div className="min-h-screen w-screen bg-zinc-700 pb-8">
+          <Header title="Create Scape" />
+          <div className="flex flex-col items-center mt-8">
+            <div className="w-1/2 flex flex-col gap-4">
+              <LabeledInput
+                description="Jogo"
+                placeholder="Nome do jogo de tabuleiro"
+                toUppercase={false}
+                value={boardGameName}
+                onChange={changeBoardGameName}
+              />
+              <LabeledInput
+                description="Código de Barras"
+                placeholder="Código de barras do jogo"
+                toUppercase={false}
+                value={barCode}
+                onChange={chageBarCode}
+              />
+              <div className="flex gap-12 items-end">
+                <LabeledInput
+                  description="Idade Mínima"
+                  placeholder="Idade mínima para jogar"
+                  toUppercase={false}
+                  value={minAge}
+                  onChange={changeMinAge}
+                />
+                <LabeledInput
+                  description="Quantidade de Jogadores"
+                  placeholder={"Quantidade máxima de jogadores"}
+                  toUppercase={false}
+                  value={quantityOfPlayers}
+                  onChange={changeQuantityOfPlayers}
+                />
+              </div>
+              <LabeledInput
+                description="Local de Armazenagem"
+                placeholder="Local onde o jogo é armazenado"
+                toUppercase={false}
+                value={storageLocation}
+                onChange={changeStorageLocation}
+              />
+              <div className="flex gap-12 items-end">
+                <LabeledInput
+                  description="Editora"
+                  placeholder="Editora do jogo"
+                  toUppercase={false}
+                  value={publisher}
+                  onChange={changePublisher}
+                />
+                <LabeledInput
+                  description="Designers do jogo"
+                  placeholder="Nome dos designers do jogo"
+                  toUppercase={false}
+                  value={designers}
+                  onChange={changeDesigners}
+                />
+              </div>
+              
+              <LabeledInput
+                  description="Categoria Principal do Jogo (Ex: Card Game)"
+                  placeholder="Categoria Principal"
+                  toUppercase={false}
+                  value={mainCategory}
+                  onChange={changeMainCategory}
+                />
+
+              {mechanicsList.map((mechanic, idx) => (
+                <LabeledInput
+                  key={idx}
+                  description={idx === 0 ? "Mecânica" : `Mecânica ${idx + 1}`}
+                  placeholder="Mecânica do jogo"
+                  toUppercase={false}
+                  value={mechanic}
+                  onChange={e => handleMechanicChange(idx, e.target.value)}
+                />
+              ))}
+              <button
+                type="button"
+                className="text-zinc-50 text-left w-fit mb-2 text-xl"
+                onClick={handleAddMechanic}
+              >
+                Adicionar outra mecânica
+              </button>
+              {themeList.map((theme, idx) => (
+                <LabeledInput
+                  key={idx}
+                  description={idx === 0 ? "Tema" : `Tema ${idx + 1}`}
+                  placeholder="Tema do jogo"
+                  toUppercase={false}
+                  value={theme}
+                  onChange={e => handleThemesChanges(idx, e.target.value)}
+                />
+              ))}
+              <button
+                type="button"
+                className="text-zinc-50 text-left w-fit mb-2 text-xl"
+                onClick={handleAddTheme}
+              >
+                Adicionar outro tema
+              </button>              
+              <div className="flex gap-12 items-end">
+                <LabeledInput
+                  description="Quantidade Ideal de Jogadores"
+                  placeholder="Sugestão de quantidade de jogadores"
+                  toUppercase={false}
+                  value={sugestedNumberOfPlayers}
+                  onChange={changeSugestedNumberOfPlayers}
+                />
+                <LabeledInput
+                  description="Avaliação do jogo no BGG"
+                  placeholder="Avaliação no BGG"
+                  toUppercase={false}
+                  value={bggRating}
+                  onChange={changeBggRating}
+                />
+              </div>
+              <LabeledInput
+                description="Proprietário"
+                placeholder="Proprietário do jogo"
+                toUppercase={false}
+                value={owner}
+                onChange={changeOwner}
+              />
+              {addBoardGameError &&
+                <span className="text-red-400 font-bold text-center">Preencha todos os campos</span>
+              }
+              <div className="flex justify-center">
+                <PrimaryButton
+                  className="w-fit text-2xl font-bold px-8 mt-6"
+                  onClick={handleUpdate}
+                  text="Atualizar Jogo"
+                  fullWidth={false}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       : 
         <div className="h-screen w-screen bg-zinc-700 p-0 m-0">
           <Header title="Scape" />
@@ -337,12 +573,11 @@ export function BoardGames() {
                 status: boardGame.isAvailable ? "Disponível" : "Indisponível",
                 bestQuantity: boardGame.bestQuantityOfPlayers
               }))}
-              hasEdit={false}
-              hasDelete={false}
-              onDelete={() => console.log("Delete")}
-              onEdit={() => setIsEditing(false)}
+              hasEdit={true}
+              hasDelete={true}
+              onDelete={handleDelete}
+              onEdit={handleOnClickEdit}
               hasAddPresence={false}
-              onRowClick={() => setIsEditing(true)}
             />
           </div>
           <div className="flex w-full justify-end mt-9 px-14">
